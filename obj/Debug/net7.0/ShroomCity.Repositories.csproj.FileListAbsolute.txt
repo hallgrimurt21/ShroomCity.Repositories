@@ -1,0 +1,16 @@
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\bin\Debug\net7.0\ShroomCity.Repositories.deps.json
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\bin\Debug\net7.0\ShroomCity.Repositories.dll
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\bin\Debug\net7.0\ShroomCity.Repositories.pdb
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\bin\Debug\net7.0\ShroomCity.Models.dll
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\bin\Debug\net7.0\ShroomCity.Models.pdb
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.csproj.AssemblyReference.cache
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.AssemblyInfoInputs.cache
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.AssemblyInfo.cs
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.csproj.CoreCompileInputs.cache
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.sourcelink.json
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.csproj.CopyComplete
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.dll
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\refint\ShroomCity.Repositories.dll
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.pdb
+C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ref\ShroomCity.Repositories.dll
