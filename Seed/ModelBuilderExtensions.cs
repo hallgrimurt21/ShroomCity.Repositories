@@ -1,9 +1,8 @@
+namespace ShroomCity.Repositories.Seed;
 using Microsoft.EntityFrameworkCore;
 using ShroomCity.Models.Constants;
 using ShroomCity.Models.Entities;
 using ShroomCity.Models.Enums;
-
-namespace ShroomCity.Repositories.Seed;
 
 public static class ModelBuilderExtensions
 {
