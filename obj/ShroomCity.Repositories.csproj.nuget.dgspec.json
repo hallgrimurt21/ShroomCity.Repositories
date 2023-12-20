@@ -54,8 +54,7 @@
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
+          }
         }
       }
     },
@@ -119,8 +118,7 @@
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
+          }
         }
       }
     }

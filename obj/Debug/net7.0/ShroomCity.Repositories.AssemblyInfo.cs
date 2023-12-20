@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ShroomCity.Repositories")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7dd4087120e5b278c6723ade5ad025b3a0576443")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("ShroomCity.Repositories")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ShroomCity.Repositories")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
