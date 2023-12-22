@@ -6,6 +6,7 @@ using ShroomCity.Models.Entities;
 using ShroomCity.Models.InputModels;
 using ShroomCity.Repositories.Interfaces;
 using ShroomCity.Utilities.Exceptions;
+using ShroomCity.Models.Constants;
 public class AccountRepository : IAccountRepository
 {
     private readonly ShroomCityDbContext context;
@@ -21,7 +22,7 @@ public class AccountRepository : IAccountRepository
             return null;
         }
         var analystRole = await this.context.Roles
-            .FirstOrDefaultAsync(r => r.Name == "Analyst") ?? throw new RoleNotFoundException("Analyst");
+            .FirstOrDefaultAsync(r => r.Name == RoleConstants.Analyst) ?? throw new RoleNotFoundException(RoleConstants.Analyst);
 
         var permissions = analystRole.Permissions.Select(p => p.Code).ToList();
         var token = 123; /// TODO
