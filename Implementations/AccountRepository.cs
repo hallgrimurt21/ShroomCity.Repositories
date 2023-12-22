@@ -36,7 +36,7 @@ public class AccountRepository : IAccountRepository
         };
         this.context.Users.Add(newUser);
         await this.context.SaveChangesAsync();
-        return new UserDto { Name = newUser.Name, EmailAddress = newUser.EmailAddress, Permissions = permissions, TokenId = token };
+        return new UserDto { Name = newUser.Name, EmailAddress = newUser.EmailAddress, Permissions = permissions!, TokenId = token };
     }
 
     public Task<UserDto?> SignIn(LoginInputModel inputModel)
