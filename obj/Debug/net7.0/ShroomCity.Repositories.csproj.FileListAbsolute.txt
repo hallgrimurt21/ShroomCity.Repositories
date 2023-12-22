@@ -13,3 +13,11 @@ C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net
 C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\refint\ShroomCity.Repositories.dll
 C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.pdb
 C:\Users\LILwh\OneDrive\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ref\ShroomCity.Repositories.dll
+C:\Users\Halli\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.csproj.AssemblyReference.cache
+C:\Users\Halli\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Halli\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.AssemblyInfoInputs.cache
+C:\Users\Halli\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.AssemblyInfo.cs
+C:\Users\Halli\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.csproj.CoreCompileInputs.cache
+C:\Users\Halli\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.dll
+C:\Users\Halli\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\refint\ShroomCity.Repositories.dll
+C:\Users\Halli\Desktop\ShroomCity\ShroomCity.Repositories\obj\Debug\net7.0\ShroomCity.Repositories.pdb
