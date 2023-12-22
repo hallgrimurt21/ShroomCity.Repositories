@@ -5,7 +5,7 @@ using ShroomCity.Models.Dtos;
 using ShroomCity.Models.Entities;
 using ShroomCity.Models.InputModels;
 using ShroomCity.Repositories.Interfaces;
-
+using ShroomCity.Utilities.Exceptions;
 public class AccountRepository : IAccountRepository
 {
     private readonly ShroomCityDbContext context;
@@ -21,10 +21,10 @@ public class AccountRepository : IAccountRepository
             return null;
         }
         var analystRole = await this.context.Roles
-            .FirstOrDefaultAsync(r => r.Name == "Analyst") ?? throw new Exception("Role Analyst not found");
+            .FirstOrDefaultAsync(r => r.Name == "Analyst") ?? throw new RoleNotFoundException("Analyst");
 
         var permissions = analystRole.Permissions.Select(p => p.Code).ToList();
-        var token = "Todo: generate token", /// TODO
+        var token = 123; /// TODO
         var newUser = new User
         {
             Name = inputModel.FullName,
