@@ -1,6 +1,5 @@
-using ShroomCity.Repositories.Interfaces;
-
 namespace ShroomCity.Repositories.Implementations;
+using ShroomCity.Repositories.Interfaces;
 
 public class TokenRepository : ITokenRepository
 {
