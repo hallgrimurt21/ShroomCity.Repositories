@@ -1,4 +1,4 @@
-namespace ShroomCity.Repositories.Implementations;
+namespace ShroomCity.Repositories.DbContext;
 using Microsoft.EntityFrameworkCore;
 using ShroomCity.Models.Entities;
 using ShroomCity.Repositories.Seed;
