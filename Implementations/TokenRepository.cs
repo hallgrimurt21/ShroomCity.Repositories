@@ -1,4 +1,6 @@
 namespace ShroomCity.Repositories.Implementations;
+
+using ShroomCity.Models.Entities;
 using ShroomCity.Repositories.DbContext;
 using ShroomCity.Repositories.Interfaces;
 using ShroomCity.Utilities.Exceptions;
@@ -15,10 +17,16 @@ public class TokenRepository : ITokenRepository
         await this.context.SaveChangesAsync();
     }
 
-    public Task<int> CreateToken()
+    public async Task<int> CreateToken()
     {
-        throw new NotImplementedException();
-    }   
+        var token = new JwtToken
+        {
+            Blacklisted = false
+        };
+        this.context.JwtTokens.Add(token);
+        await this.context.SaveChangesAsync();
+        return token.Id;
+    }
 
     public async Task<bool> IsTokenBlacklisted(int tokenId)
     {
