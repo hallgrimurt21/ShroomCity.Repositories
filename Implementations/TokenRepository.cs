@@ -1,21 +1,36 @@
-using ShroomCity.Repositories.Interfaces;
-
 namespace ShroomCity.Repositories.Implementations;
+
+using ShroomCity.Models.Entities;
+using ShroomCity.Repositories.DbContext;
+using ShroomCity.Repositories.Interfaces;
+using ShroomCity.Utilities.Exceptions;
 
 public class TokenRepository : ITokenRepository
 {
-    public Task BlacklistToken(int tokenId)
+    private readonly ShroomCityDbContext context;
+    public TokenRepository(ShroomCityDbContext context) => this.context = context;
+    public async Task BlacklistToken(int tokenId)
     {
-        throw new NotImplementedException();
+        var token = await this.context.JwtTokens.FindAsync(tokenId) ?? throw new TokenNotFoundException(tokenId);
+
+        token.Blacklisted = true;
+        await this.context.SaveChangesAsync();
     }
 
-    public Task<int> CreateToken()
+    public async Task<int> CreateToken()
     {
-        throw new NotImplementedException();
+        var token = new JwtToken
+        {
+            Blacklisted = false
+        };
+        this.context.JwtTokens.Add(token);
+        await this.context.SaveChangesAsync();
+        return token.Id;
     }
 
-    public Task<bool> IsTokenBlacklisted(int tokenId)
+    public async Task<bool> IsTokenBlacklisted(int tokenId)
     {
-        throw new NotImplementedException();
+        var token = await this.context.JwtTokens.FindAsync(tokenId) ?? throw new TokenNotFoundException(tokenId);
+        return token.Blacklisted;
     }
 }
