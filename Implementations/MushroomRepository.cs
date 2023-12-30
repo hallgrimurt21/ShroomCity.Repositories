@@ -1,11 +1,14 @@
+namespace ShroomCity.Repositories.Implementations;
 using ShroomCity.Models.Dtos;
 using ShroomCity.Models.InputModels;
 using ShroomCity.Repositories.Interfaces;
-
-namespace ShroomCity.Repositories.Implementations;
+using ShroomCity.Repositories.DbContext;
+using Microsoft.EntityFrameworkCore;
 
 public class MushroomRepository : IMushroomRepository
 {
+    private readonly ShroomCityDbContext context;
+    public MushroomRepository(ShroomCityDbContext context) => this.context = context;
     public Task<int> CreateMushroom(MushroomInputModel mushroom, string researcherEmailAddress, List<AttributeDto> attributes)
     {
         throw new NotImplementedException();
@@ -21,9 +24,32 @@ public class MushroomRepository : IMushroomRepository
         throw new NotImplementedException();
     }
 
-    public Task<MushroomDetailsDto?> GetMushroomById(int id)
+    public async Task<MushroomDetailsDto?> GetMushroomById(int id)
     {
-        throw new NotImplementedException();
+        var mushroom = await this.context.Mushrooms
+        .Include(m => m.Attributes)
+        .FirstOrDefaultAsync(m => m.Id == id);
+
+        if (mushroom == null)
+        {
+            return null;
+        }
+
+        var mushroomDetailsDto = new MushroomDetailsDto
+        {
+            Id = mushroom.Id,
+            Name = mushroom.Name,
+            Description = mushroom.Description,
+            Attributes = mushroom.Attributes.Select(a => new AttributeDto
+            {
+                Id = a.Id,
+                Value = a.Value,
+                Type = a.AttributeType.Type,
+                RegisteredBy = a.RegisteredBy.Name,
+            }).ToList()
+        };
+
+        return mushroomDetailsDto;
     }
 
     public (int totalPages, IEnumerable<MushroomDto> mushrooms) GetMushroomsByCriteria(string? name, int? stemSizeMinimum, int? stemSizeMaximum, int? capSizeMinimum, int? capSizeMaximum, string? color, int pageSize, int pageNumber)
