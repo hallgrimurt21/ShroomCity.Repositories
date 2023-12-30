@@ -53,18 +53,15 @@ public class AccountRepository : IAccountRepository
 
     public async Task<UserDto?> SignIn(LoginInputModel inputModel)
     {
-        // Validate if the user exists based on condition
         var user = await this.context.Users
             .FirstOrDefaultAsync(u => u.EmailAddress == inputModel.EmailAddress && u.HashedPassword == inputModel.Password);
 
         if (user == null)
         {
-            // User not found, return null or throw an exception
             return null;
         }
         var token = await this.tokenRepository.CreateToken();
         var permissions = user.Role.Permissions.Select(p => p.Code).ToList();
-        // User found, return the user
         return new UserDto
         {
             Name = user.Name,
