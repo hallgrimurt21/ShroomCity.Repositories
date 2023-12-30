@@ -42,11 +42,35 @@ public class AccountRepository : IAccountRepository
         };
         this.context.Users.Add(newUser);
         await this.context.SaveChangesAsync();
-        return new UserDto { Name = newUser.Name, EmailAddress = newUser.EmailAddress, Permissions = permissions!, TokenId = token };
+        return new UserDto
+        {
+            Name = newUser.Name,
+            EmailAddress = newUser.EmailAddress,
+            Permissions = permissions,
+            TokenId = token
+        };
     }
 
-    public Task<UserDto?> SignIn(LoginInputModel inputModel)
+    public async Task<UserDto?> SignIn(LoginInputModel inputModel)
     {
-        throw new NotImplementedException();
+        // Validate if the user exists based on condition
+        var user = await this.context.Users
+            .FirstOrDefaultAsync(u => u.EmailAddress == inputModel.EmailAddress && u.HashedPassword == inputModel.Password);
+
+        if (user == null)
+        {
+            // User not found, return null or throw an exception
+            return null;
+        }
+        var token = await this.tokenRepository.CreateToken();
+        var permissions = user.Role.Permissions.Select(p => p.Code).ToList();
+        // User found, return the user
+        return new UserDto
+        {
+            Name = user.Name,
+            EmailAddress = user.EmailAddress,
+            Permissions = permissions,
+            TokenId = token
+        };
     }
 }
