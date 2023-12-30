@@ -4,14 +4,39 @@ using ShroomCity.Models.InputModels;
 using ShroomCity.Repositories.Interfaces;
 using ShroomCity.Repositories.DbContext;
 using Microsoft.EntityFrameworkCore;
+using ShroomCity.Models.Entities;
 
 public class MushroomRepository : IMushroomRepository
 {
     private readonly ShroomCityDbContext context;
     public MushroomRepository(ShroomCityDbContext context) => this.context = context;
-    public Task<int> CreateMushroom(MushroomInputModel mushroom, string researcherEmailAddress, List<AttributeDto> attributes)
+    public async Task<int> CreateMushroom(MushroomInputModel mushroom, string researcherEmailAddress, List<AttributeDto> attributes)
     {
-        throw new NotImplementedException();
+        // TODO
+        // var researcher = await this.context.Users.FirstOrDefaultAsync(u => u.EmailAddress == researcherEmailAddress) ?? throw new ArgumentException("Researcher with the provided email address does not exist.");
+
+        var newMushroom = new Mushroom
+        {
+            Name = mushroom.Name,
+            Description = mushroom.Description,
+        };
+
+        if (attributes != null)
+        {
+            foreach (var attributeDto in attributes)
+            {
+                var attribute = await this.context.Attributes.FindAsync(attributeDto.Id);
+                if (attribute != null)
+                {
+                    newMushroom.Attributes.Add(attribute);
+                }
+            }
+        }
+
+        this.context.Mushrooms.Add(newMushroom);
+        await this.context.SaveChangesAsync();
+
+        return newMushroom.Id;
     }
 
     public Task<bool> CreateResearchEntry(int mushroomId, string researcherEmailAddress, ResearchEntryInputModel inputModel)
