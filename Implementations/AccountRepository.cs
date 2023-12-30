@@ -1,18 +1,76 @@
+namespace ShroomCity.Repositories.DbContext;
+
+using Microsoft.EntityFrameworkCore;
 using ShroomCity.Models.Dtos;
+using ShroomCity.Models.Entities;
 using ShroomCity.Models.InputModels;
 using ShroomCity.Repositories.Interfaces;
-
-namespace ShroomCity.Repositories.Implementations;
-
+using ShroomCity.Utilities.Exceptions;
+using ShroomCity.Models.Constants;
 public class AccountRepository : IAccountRepository
 {
-    public Task<UserDto?> Register(RegisterInputModel inputModel)
+    private readonly ShroomCityDbContext context;
+    private readonly ITokenRepository tokenRepository;
+
+    public AccountRepository(ITokenRepository tokenRepository, ShroomCityDbContext context)
     {
-        throw new NotImplementedException();
+        this.tokenRepository = tokenRepository;
+        this.context = context;
     }
 
-    public Task<UserDto?> SignIn(LoginInputModel inputModel)
+    public async Task<UserDto?> Register(RegisterInputModel inputModel)
     {
-        throw new NotImplementedException();
+        var existingUser = await this.context.Users
+            .FirstOrDefaultAsync(u => u.EmailAddress == inputModel.EmailAddress);
+        if (existingUser != null)
+        {
+            return null;
+        }
+        var analystRole = await this.context.Roles
+            .FirstOrDefaultAsync(r => r.Name == RoleConstants.Analyst) ?? throw new RoleNotFoundException(RoleConstants.Analyst);
+
+        var permissions = analystRole.Permissions.Select(p => p.Code).ToList();
+        var token = await this.tokenRepository.CreateToken();
+        var newUser = new User
+        {
+            Name = inputModel.FullName,
+            EmailAddress = inputModel.EmailAddress,
+            HashedPassword = inputModel.Password,
+            Bio = inputModel.Bio,
+            Role = analystRole,
+            RegisterationDate = DateTime.Now
+        };
+        this.context.Users.Add(newUser);
+        await this.context.SaveChangesAsync();
+        return new UserDto
+        {
+            Name = newUser.Name,
+            EmailAddress = newUser.EmailAddress,
+            Permissions = permissions,
+            TokenId = token
+        };
+    }
+
+    public async Task<UserDto?> SignIn(LoginInputModel inputModel)
+    {
+        // Validate if the user exists based on condition
+        var user = await this.context.Users
+            .FirstOrDefaultAsync(u => u.EmailAddress == inputModel.EmailAddress && u.HashedPassword == inputModel.Password);
+
+        if (user == null)
+        {
+            // User not found, return null or throw an exception
+            return null;
+        }
+        var token = await this.tokenRepository.CreateToken();
+        var permissions = user.Role.Permissions.Select(p => p.Code).ToList();
+        // User found, return the user
+        return new UserDto
+        {
+            Name = user.Name,
+            EmailAddress = user.EmailAddress,
+            Permissions = permissions,
+            TokenId = token
+        };
     }
 }
