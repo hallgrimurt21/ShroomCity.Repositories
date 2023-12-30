@@ -19,9 +19,18 @@ public class MushroomRepository : IMushroomRepository
         throw new NotImplementedException();
     }
 
-    public Task<bool> DeleteMushroomById(int mushroomId)
+    public async Task<bool> DeleteMushroomById(int mushroomId)
     {
-        throw new NotImplementedException();
+        var mushroom = await this.context.Mushrooms.FindAsync(mushroomId);
+        if (mushroom == null)
+        {
+            return false;
+        }
+
+        this.context.Mushrooms.Remove(mushroom);
+        var saveResult = await this.context.SaveChangesAsync();
+
+        return saveResult > 0;
     }
 
     public async Task<MushroomDetailsDto?> GetMushroomById(int id)
