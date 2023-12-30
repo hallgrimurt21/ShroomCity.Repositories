@@ -34,15 +34,36 @@ public class MushroomRepository : IMushroomRepository
             }
         }
 
-        this.context.Mushrooms.Add(newMushroom);
-        await this.context.SaveChangesAsync();
+        _ = this.context.Mushrooms.Add(newMushroom);
+        _ = await this.context.SaveChangesAsync();
 
         return newMushroom.Id;
     }
 
-    public Task<bool> CreateResearchEntry(int mushroomId, string researcherEmailAddress, ResearchEntryInputModel inputModel)
+    public async Task<bool> CreateResearchEntry(int mushroomId, string researcherEmailAddress, ResearchEntryInputModel inputModel)
     {
-        throw new NotImplementedException();
+        var researcher = await this.context.Users.FirstOrDefaultAsync(u => u.EmailAddress == researcherEmailAddress) ?? throw new ArgumentException("Researcher with the provided email address does not exist.");
+
+        var mushroom = await this.context.Mushrooms.FindAsync(mushroomId) ?? throw new ArgumentException("Mushroom with the provided ID does not exist.");
+
+        foreach (var entry in inputModel.Entries)
+        {
+            var attributeType = await this.context.AttributeTypes.FindAsync(entry.Key) ?? throw new ArgumentException($"Attribute type with ID {entry.Key} does not exist.");
+
+            var researchEntry = new Attribute
+            {
+                Value = entry.Value,
+                AttributeType = attributeType,
+                RegisteredBy = researcher,
+                Mushrooms = new List<Mushroom> { mushroom },
+            };
+
+            _ = this.context.Attributes.Add(researchEntry);
+        }
+
+        var result = await this.context.SaveChangesAsync();
+
+        return result > 0;
     }
 
     public async Task<bool> DeleteMushroomById(int mushroomId)
@@ -53,7 +74,7 @@ public class MushroomRepository : IMushroomRepository
             return false;
         }
 
-        this.context.Mushrooms.Remove(mushroom);
+        _ = this.context.Mushrooms.Remove(mushroom);
         var saveResult = await this.context.SaveChangesAsync();
 
         return saveResult > 0;
