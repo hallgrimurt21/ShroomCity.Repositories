@@ -5,6 +5,7 @@ using ShroomCity.Repositories.Interfaces;
 using ShroomCity.Repositories.DbContext;
 using Microsoft.EntityFrameworkCore;
 using ShroomCity.Models.Entities;
+using System.Globalization;
 
 public class MushroomRepository : IMushroomRepository
 {
@@ -88,7 +89,39 @@ public class MushroomRepository : IMushroomRepository
 
     public (int totalPages, IEnumerable<MushroomDto> mushrooms) GetMushroomsByCriteria(string? name, int? stemSizeMinimum, int? stemSizeMaximum, int? capSizeMinimum, int? capSizeMaximum, string? color, int pageSize, int pageNumber)
     {
-        throw new NotImplementedException();
+        var query = this.context.Mushrooms.AsQueryable();
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            query = query.Where(m => m.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (stemSizeMinimum.HasValue && stemSizeMaximum.HasValue)
+        {
+            query = query.Where(m => m.Attributes.Where(a => a.AttributeType.Type == "StemSize").Average(a => double.Parse(a.Value, CultureInfo.InvariantCulture)) >= stemSizeMinimum.Value && m.Attributes.Where(a => a.AttributeType.Type == "StemSize").Average(a => double.Parse(a.Value, CultureInfo.InvariantCulture)) <= stemSizeMaximum.Value);
+        }
+
+        if (capSizeMinimum.HasValue && capSizeMaximum.HasValue)
+        {
+            query = query.Where(m => m.Attributes.Where(a => a.AttributeType.Type == "CapSize").Average(a => double.Parse(a.Value, CultureInfo.InvariantCulture)) >= capSizeMinimum.Value && m.Attributes.Where(a => a.AttributeType.Type == "CapSize").Average(a => double.Parse(a.Value, CultureInfo.InvariantCulture)) <= capSizeMaximum.Value);
+        }
+
+        if (!string.IsNullOrEmpty(color))
+        {
+            query = query.Where(m => m.Attributes.Any(a => a.AttributeType.Type == "Color" && a.Value.ToString().Equals(color, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        var count = query.Count();
+        var totalPages = (int)Math.Ceiling((double)count / pageSize);
+        query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
+        var mushrooms = query.Select(m => new MushroomDto
+        {
+            Id = m.Id,
+            Name = m.Name,
+            Description = m.Description,
+        }).ToList();
+        return (totalPages, mushrooms);
     }
 
     public async Task<bool> UpdateMushroomById(int mushroomId, MushroomUpdateInputModel inputModel)
