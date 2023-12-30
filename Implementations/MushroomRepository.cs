@@ -57,8 +57,20 @@ public class MushroomRepository : IMushroomRepository
         throw new NotImplementedException();
     }
 
-    public Task<bool> UpdateMushroomById(int mushroomId, MushroomUpdateInputModel inputModel)
+    public async Task<bool> UpdateMushroomById(int mushroomId, MushroomUpdateInputModel inputModel)
     {
-        throw new NotImplementedException();
+        var mushroom = await this.context.Mushrooms.FindAsync(mushroomId);
+        if (mushroom == null)
+        {
+            return false;
+        }
+        mushroom.Name = inputModel.Name;
+        if (inputModel.Description != null)
+        {
+            mushroom.Description = inputModel.Description;
+        }
+        var saveResult = await this.context.SaveChangesAsync();
+
+        return saveResult > 0;
     }
 }
