@@ -50,8 +50,33 @@ public class ResearcherRepository : IResearcherRepository
         throw new NotImplementedException();
     }
 
-    public Task<ResearcherDto?> GetResearcherById(int id)
+    public async Task<ResearcherDto?> GetResearcherById(int id)
     {
-        throw new NotImplementedException();
+        var user = await this.context.Users
+        .Include(u => u.Role)
+        .FirstOrDefaultAsync(u => u.Id == id && (u.Role.Name == RoleConstants.Researcher || u.Role.Name == RoleConstants.Admin));
+
+        if (user == null)
+        {
+            return null;
+        }
+
+        var mushrooms = await this.context.Attributes
+        .Include(a => a.Mushrooms)
+        .Where(a => a.RegisteredById == user.Id)
+        .SelectMany(a => a.Mushrooms)
+        .Distinct()
+        .ToListAsync();
+
+        var researcher = new ResearcherDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            EmailAddress = user.EmailAddress,
+            Bio = user.Bio,
+            AssociatedMushrooms = mushrooms.Select(m => new MushroomDto { Name = m.Name, Description = m.Description }).ToList()
+        };
+
+        return researcher;
     }
 }
