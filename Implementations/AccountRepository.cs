@@ -1,4 +1,4 @@
-namespace ShroomCity.Repositories.Implementations;
+namespace ShroomCity.Repositories.DbContext;
 
 using Microsoft.EntityFrameworkCore;
 using ShroomCity.Models.Dtos;
@@ -10,8 +10,13 @@ using ShroomCity.Models.Constants;
 public class AccountRepository : IAccountRepository
 {
     private readonly ShroomCityDbContext context;
+    private readonly ITokenRepository tokenRepository;
 
-    public AccountRepository(ShroomCityDbContext context) => this.context = context;
+    public AccountRepository(ITokenRepository tokenRepository, ShroomCityDbContext context)
+    {
+        this.tokenRepository = tokenRepository;
+        this.context = context;
+    }
 
     public async Task<UserDto?> Register(RegisterInputModel inputModel)
     {
@@ -25,7 +30,7 @@ public class AccountRepository : IAccountRepository
             .FirstOrDefaultAsync(r => r.Name == RoleConstants.Analyst) ?? throw new RoleNotFoundException(RoleConstants.Analyst);
 
         var permissions = analystRole.Permissions.Select(p => p.Code).ToList();
-        var token = 123; /// TODO
+        var token = await this.tokenRepository.CreateToken();
         var newUser = new User
         {
             Name = inputModel.FullName,
