@@ -11,9 +11,25 @@ public class ResearcherRepository : IResearcherRepository
     private readonly ShroomCityDbContext context;
 
     public ResearcherRepository(ShroomCityDbContext context) => this.context = context;
-    public Task<int?> CreateResearcher(string createdBy, ResearcherInputModel inputModel)
+    public async Task<int?> CreateResearcher(string createdBy, ResearcherInputModel inputModel)
     {
-        throw new NotImplementedException();
+        var user = await this.context.Users.FirstOrDefaultAsync(u => u.EmailAddress == inputModel.EmailAddress);
+        if (user == null)
+        {
+            return null;
+        }
+
+        var researcherRole = await this.context.Roles.FirstOrDefaultAsync(r => r.Name == RoleConstants.Researcher);
+        if (researcherRole == null)
+        {
+            return null;
+        }
+
+        user.Role = researcherRole;
+
+        await this.context.SaveChangesAsync();
+
+        return user.Id;
     }
 
     public async Task<IEnumerable<ResearcherDto>?> GetAllResearchers()
