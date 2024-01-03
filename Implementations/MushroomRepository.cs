@@ -108,7 +108,7 @@ public class MushroomRepository : IMushroomRepository
         return mushroomDetailsDto;
     }
 
-    public (int totalPages, IEnumerable<MushroomDto> mushrooms) GetMushroomsByCriteria(string? name, int? stemSizeMinimum, int? stemSizeMaximum, int? capSizeMinimum, int? capSizeMaximum, string? color, int pageSize, int pageNumber)
+    public async Task<(int totalPages, IEnumerable<MushroomDto> mushrooms)> GetMushroomsByCriteria(string? name, int? stemSizeMinimum, int? stemSizeMaximum, int? capSizeMinimum, int? capSizeMaximum, string? color, int pageSize, int pageNumber)
     {
         var query = this.context.Mushrooms.AsQueryable();
 

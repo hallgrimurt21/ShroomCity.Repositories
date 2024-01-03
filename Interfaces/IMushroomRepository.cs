@@ -8,7 +8,7 @@ public interface IMushroomRepository
     Task<bool> CreateResearchEntry(int mushroomId, string researcherEmailAddress, ResearchEntryInputModel inputModel);
     Task<bool> DeleteMushroomById(int mushroomId);
     Task<MushroomDetailsDto?> GetMushroomById(int id);
-    (int totalPages, IEnumerable<MushroomDto> mushrooms) GetMushroomsByCriteria(
+    Task<(int totalPages, IEnumerable<MushroomDto> mushrooms)> GetMushroomsByCriteria(
         string? name,
         int? stemSizeMinimum,
         int? stemSizeMaximum,
