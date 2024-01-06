@@ -17,8 +17,8 @@ public class ShroomCityDbContext : DbContext
     public DbSet<JwtToken> JwtTokens { get; set; }
     public DbSet<Mushroom> Mushrooms { get; set; }
     public DbSet<Permission> Permissions { get; set; }
-    public DbSet<Role> Roles { get; set; }
-    public DbSet<User> Users { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<User> Users { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Attribute>()
