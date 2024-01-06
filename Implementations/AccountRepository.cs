@@ -38,7 +38,7 @@ public class AccountRepository : IAccountRepository
             HashedPassword = inputModel.Password,
             Bio = inputModel.Bio,
             Role = analystRole,
-            RegisterationDate = DateTime.Now
+            RegisterationDate = DateTime.Now.ToUniversalTime(),
         };
         this.context.Users.Add(newUser);
         await this.context.SaveChangesAsync();
