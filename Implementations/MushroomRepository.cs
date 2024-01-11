@@ -6,6 +6,9 @@ using ShroomCity.Repositories.DbContext;
 using Microsoft.EntityFrameworkCore;
 using ShroomCity.Models.Entities;
 using System.Globalization;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 public class MushroomRepository : IMushroomRepository
 {
@@ -13,26 +16,28 @@ public class MushroomRepository : IMushroomRepository
     public MushroomRepository(ShroomCityDbContext context) => this.context = context;
     public async Task<int> CreateMushroom(MushroomInputModel mushroom, string researcherEmailAddress, List<AttributeDto> attributes)
     {
-        // TODO
-        // var researcher = await this.context.Users.FirstOrDefaultAsync(u => u.EmailAddress == researcherEmailAddress) ?? throw new ArgumentException("Researcher with the provided email address does not exist.");
-
+        var mushroomAttributes = new List<Attribute>();
+        if (attributes != null)
+        {
+            foreach (var attribute in attributes)
+            {
+                var researcher = await this.context.Users.FirstOrDefaultAsync(u => u.EmailAddress == attribute.RegisteredBy) ?? throw new ArgumentException("Researcher with the provided email address does not exist.");
+                var type = await this.context.AttributeTypes.FirstOrDefaultAsync(at => at.Type == attribute.Type);
+                var mushroomAttribute = new Attribute
+                {
+                    Value = attribute.Value,
+                    AttributeType = type,
+                    RegisteredBy = researcher,
+                };
+                mushroomAttributes.Add(mushroomAttribute);
+            }
+        }
         var newMushroom = new Mushroom
         {
             Name = mushroom.Name,
             Description = mushroom.Description,
+            Attributes = mushroomAttributes
         };
-
-        if (attributes != null)
-        {
-            foreach (var attributeDto in attributes)
-            {
-                var attribute = await this.context.Attributes.FindAsync(attributeDto.Id);
-                if (attribute != null)
-                {
-                    newMushroom.Attributes.Add(attribute);
-                }
-            }
-        }
 
         _ = this.context.Mushrooms.Add(newMushroom);
         _ = await this.context.SaveChangesAsync();
@@ -84,25 +89,30 @@ public class MushroomRepository : IMushroomRepository
     {
         var mushroom = await this.context.Mushrooms
         .Include(m => m.Attributes)
+            .ThenInclude(a => a.AttributeType)
+        .Include(m => m.Attributes)
+            .ThenInclude(a => a.RegisteredBy) // Assuming RegisteredBy is a User entity
         .FirstOrDefaultAsync(m => m.Id == id);
 
         if (mushroom == null)
         {
             return null;
         }
+        var attributes = new List<AttributeDto>();
+        attributes.AddRange(mushroom.Attributes.Select(a => new AttributeDto
+        {
+            Id = a.Id,
+            Value = a.Value,
+            Type = a.AttributeType.Type,
+            RegisteredBy = a.RegisteredBy.Name,
+        }).ToList());
 
         var mushroomDetailsDto = new MushroomDetailsDto
         {
             Id = mushroom.Id,
             Name = mushroom.Name,
             Description = mushroom.Description,
-            Attributes = mushroom.Attributes.Select(a => new AttributeDto
-            {
-                Id = a.Id,
-                Value = a.Value,
-                Type = a.AttributeType.Type,
-                RegisteredBy = a.RegisteredBy.Name,
-            }).ToList()
+            Attributes = attributes
         };
 
         return mushroomDetailsDto;
@@ -114,7 +124,8 @@ public class MushroomRepository : IMushroomRepository
 
         if (!string.IsNullOrEmpty(name))
         {
-            query = query.Where(m => m.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+            var lowerCaseName = name.ToLower();
+            query = query.Where(m => m.Name.ToLower().Contains(lowerCaseName));
         }
 
         if (stemSizeMinimum.HasValue && stemSizeMaximum.HasValue)
