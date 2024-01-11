@@ -1,4 +1,4 @@
-namespace ShroomCity.Repositories.DbContext;
+namespace ShroomCity.Repositories.Implementations;
 
 using Microsoft.EntityFrameworkCore;
 using ShroomCity.Models.Dtos;
@@ -7,6 +7,8 @@ using ShroomCity.Models.InputModels;
 using ShroomCity.Repositories.Interfaces;
 using ShroomCity.Utilities.Exceptions;
 using ShroomCity.Models.Constants;
+using ShroomCity.Repositories.DbContext;
+
 public class AccountRepository : IAccountRepository
 {
     private readonly ShroomCityDbContext context;
