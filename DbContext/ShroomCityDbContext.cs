@@ -27,8 +27,8 @@ public class ShroomCityDbContext : DbContext
         // Foreign key to AttributeType
         modelBuilder.Entity<Attribute>()
             .HasOne(a => a.AttributeType)
-            .WithOne(at => at.Attribute)
-            .HasForeignKey<Attribute>(a => a.AttributeTypeId);
+            .WithMany(at => at.Attributes)
+            .HasForeignKey(a => a.AttributeTypeId);
         // Foreign key to User
         modelBuilder.Entity<Attribute>()
             .HasOne(a => a.RegisteredBy)
