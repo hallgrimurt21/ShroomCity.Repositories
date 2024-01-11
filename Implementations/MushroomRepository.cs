@@ -53,7 +53,7 @@ public class MushroomRepository : IMushroomRepository
 
         foreach (var entry in inputModel.Entries)
         {
-            var attributeType = await this.context.AttributeTypes.FindAsync(entry.Key) ?? throw new ArgumentException($"Attribute type with ID {entry.Key} does not exist.");
+            var attributeType = await this.context.AttributeTypes.FirstOrDefaultAsync(u => u.Type == entry.Key) ?? throw new ArgumentException($"Attribute type with ID {entry.Key} does not exist.");
 
             var researchEntry = new Attribute
             {
