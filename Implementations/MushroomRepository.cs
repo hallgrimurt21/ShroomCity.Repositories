@@ -5,10 +5,9 @@ using ShroomCity.Repositories.Interfaces;
 using ShroomCity.Repositories.DbContext;
 using Microsoft.EntityFrameworkCore;
 using ShroomCity.Models.Entities;
-using System.Globalization;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
+using ShroomCity.Utilities.Exceptions;
+using System.Globalization;
 
 public class MushroomRepository : IMushroomRepository
 {
@@ -27,7 +26,7 @@ public class MushroomRepository : IMushroomRepository
                 {
                     Value = attribute.Value,
                     AttributeType = type,
-                    RegisteredBy = researcher,
+                    RegisteredBy = researcher
                 };
                 mushroomAttributes.Add(mushroomAttribute);
             }
@@ -38,7 +37,6 @@ public class MushroomRepository : IMushroomRepository
             Description = mushroom.Description,
             Attributes = mushroomAttributes
         };
-
         _ = this.context.Mushrooms.Add(newMushroom);
         _ = await this.context.SaveChangesAsync();
 
@@ -47,13 +45,13 @@ public class MushroomRepository : IMushroomRepository
 
     public async Task<bool> CreateResearchEntry(int mushroomId, string researcherEmailAddress, ResearchEntryInputModel inputModel)
     {
-        var researcher = await this.context.Users.FirstOrDefaultAsync(u => u.EmailAddress == researcherEmailAddress) ?? throw new ArgumentException("Researcher with the provided email address does not exist.");
+        var researcher = await this.context.Users.FirstOrDefaultAsync(u => u.EmailAddress == researcherEmailAddress) ?? throw new ResearcherNotFoundException(researcherEmailAddress);
 
-        var mushroom = await this.context.Mushrooms.FindAsync(mushroomId) ?? throw new ArgumentException("Mushroom with the provided ID does not exist.");
+        var mushroom = await this.context.Mushrooms.FindAsync(mushroomId) ?? throw new MushroomNotFoundException();
 
         foreach (var entry in inputModel.Entries)
         {
-            var attributeType = await this.context.AttributeTypes.FirstOrDefaultAsync(u => u.Type == entry.Key) ?? throw new ArgumentException($"Attribute type with ID {entry.Key} does not exist.");
+            var attributeType = await this.context.AttributeTypes.FirstOrDefaultAsync(u => u.Type == entry.Key) ?? throw new AttributeTypeNotFoundException(entry.Key);
 
             var researchEntry = new Attribute
             {
@@ -130,17 +128,51 @@ public class MushroomRepository : IMushroomRepository
 
         if (stemSizeMinimum.HasValue && stemSizeMaximum.HasValue)
         {
-            query = query.Where(m => m.Attributes.Where(a => a.AttributeType.Type == "StemSize").Average(a => double.Parse(a.Value, CultureInfo.InvariantCulture)) >= stemSizeMinimum.Value && m.Attributes.Where(a => a.AttributeType.Type == "StemSize").Average(a => double.Parse(a.Value, CultureInfo.InvariantCulture)) <= stemSizeMaximum.Value);
+            var stemSizeAttributes = this.context.Attributes
+            .Where(a => a.AttributeType.Type == "StemSize")
+            .SelectMany(a => a.Mushrooms, (a, m) => new { AttributeValue = a.Value, Mushroom = m })
+            .ToList();
+
+            var groupedAttributes = stemSizeAttributes
+                .GroupBy(am => am.Mushroom.Id)
+                .Select(g => new
+                {
+                    MushroomId = g.Key,
+                    AverageValue = g.Average(am => double.Parse(am.AttributeValue))
+                })
+                .Where(a => a.AverageValue >= stemSizeMinimum.Value && a.AverageValue <= stemSizeMaximum.Value)
+                .ToList();
+
+            var validMushroomIds = groupedAttributes.Select(a => a.MushroomId).ToList();
+
+            query = query.Where(m => validMushroomIds.Contains(m.Id));
         }
 
         if (capSizeMinimum.HasValue && capSizeMaximum.HasValue)
         {
-            query = query.Where(m => m.Attributes.Where(a => a.AttributeType.Type == "CapSize").Average(a => double.Parse(a.Value, CultureInfo.InvariantCulture)) >= capSizeMinimum.Value && m.Attributes.Where(a => a.AttributeType.Type == "CapSize").Average(a => double.Parse(a.Value, CultureInfo.InvariantCulture)) <= capSizeMaximum.Value);
+            var capSizeAttributes = this.context.Attributes
+            .Where(a => a.AttributeType.Type == "CapSize")
+            .SelectMany(a => a.Mushrooms, (a, m) => new { AttributeValue = a.Value, Mushroom = m })
+            .ToList();
+
+            var groupedAttributes = capSizeAttributes
+                .GroupBy(am => am.Mushroom.Id)
+                .Select(g => new
+                {
+                    MushroomId = g.Key,
+                    AverageValue = g.Average(am => double.Parse(am.AttributeValue))
+                })
+                .Where(a => a.AverageValue >= capSizeMinimum.Value && a.AverageValue <= capSizeMaximum.Value)
+                .ToList();
+
+            var validMushroomIds = groupedAttributes.Select(a => a.MushroomId).ToList();
+
+            query = query.Where(m => validMushroomIds.Contains(m.Id));
         }
 
         if (!string.IsNullOrEmpty(color))
         {
-            query = query.Where(m => m.Attributes.Any(a => a.AttributeType.Type == "Color" && a.Value.ToString().Equals(color, StringComparison.OrdinalIgnoreCase)));
+            query = query.Where(m => m.Attributes.Any(a => a.AttributeType.Type == "Color" && EF.Functions.Like(a.Value, color)));
         }
 
         var count = query.Count();
