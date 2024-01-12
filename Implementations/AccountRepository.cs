@@ -8,6 +8,7 @@ using ShroomCity.Repositories.Interfaces;
 using ShroomCity.Utilities.Exceptions;
 using ShroomCity.Models.Constants;
 using ShroomCity.Repositories.DbContext;
+using ShroomCity.Utilities.Hasher;
 
 public class AccountRepository : IAccountRepository
 {
@@ -33,11 +34,13 @@ public class AccountRepository : IAccountRepository
 
         var permissions = analystRole.Permissions.Select(p => p.Code).ToList();
         var token = await this.tokenRepository.CreateToken();
+        var salt = Hasher.GenerateSalt();
+        var hashedPassword = Hasher.HashPassword(inputModel.Password, salt);
         var newUser = new User
         {
             Name = inputModel.FullName,
             EmailAddress = inputModel.EmailAddress,
-            HashedPassword = inputModel.Password,
+            HashedPassword = hashedPassword,
             Bio = inputModel.Bio,
             Role = analystRole,
             RegisterationDate = DateTime.Now.ToUniversalTime(),
@@ -58,9 +61,16 @@ public class AccountRepository : IAccountRepository
         var user = await this.context.Users
             .Include(u => u.Role)
                 .ThenInclude(r => r.Permissions)
-            .FirstOrDefaultAsync(u => u.EmailAddress == inputModel.EmailAddress && u.HashedPassword == inputModel.Password) ?? throw new UserNotFoundException(inputModel.EmailAddress);
+            .FirstOrDefaultAsync(u => u.EmailAddress == inputModel.EmailAddress) ?? throw new UserNotFoundException(inputModel.EmailAddress);
+        var passwordParts = user.HashedPassword.Split('.');
+        var salt = passwordParts[0];
+        var hashedPassword = Hasher.HashPassword(inputModel.Password, salt);
         var token = await this.tokenRepository.CreateToken();
         var permissions = user.Role.Permissions.Select(p => p.Code).ToList();
+        if (hashedPassword != user.HashedPassword)
+        {
+            return null;
+        }
         return new UserDto
         {
             Name = user.Name,
