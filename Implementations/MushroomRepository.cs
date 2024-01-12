@@ -53,6 +53,13 @@ public class MushroomRepository : IMushroomRepository
         {
             var attributeType = await this.context.AttributeTypes.FirstOrDefaultAsync(u => u.Type == entry.Key) ?? throw new AttributeTypeNotFoundException(entry.Key);
 
+            if (attributeType.Type is "StemSize" or "CapSize")
+            {
+                try
+                { _ = double.Parse(entry.Value, CultureInfo.InvariantCulture); }
+                catch { throw new InvalidInputException(entry.Value, "number"); }
+            }
+
             var researchEntry = new Attribute
             {
                 Value = entry.Value,
