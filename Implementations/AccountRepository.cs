@@ -42,8 +42,8 @@ public class AccountRepository : IAccountRepository
             Role = analystRole,
             RegisterationDate = DateTime.Now.ToUniversalTime(),
         };
-        this.context.Users.Add(newUser);
-        await this.context.SaveChangesAsync();
+        _ = this.context.Users.Add(newUser);
+        _ = await this.context.SaveChangesAsync();
         return new UserDto
         {
             Name = newUser.Name,

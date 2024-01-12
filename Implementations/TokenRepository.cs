@@ -14,7 +14,7 @@ public class TokenRepository : ITokenRepository
         var token = await this.context.JwtTokens.FindAsync(tokenId) ?? throw new TokenNotFoundException(tokenId);
 
         token.Blacklisted = true;
-        await this.context.SaveChangesAsync();
+        _ = await this.context.SaveChangesAsync();
     }
 
     public async Task<int> CreateToken()
@@ -23,8 +23,8 @@ public class TokenRepository : ITokenRepository
         {
             Blacklisted = false
         };
-        this.context.JwtTokens.Add(token);
-        await this.context.SaveChangesAsync();
+        _ = this.context.JwtTokens.Add(token);
+        _ = await this.context.SaveChangesAsync();
         return token.Id;
     }
 
